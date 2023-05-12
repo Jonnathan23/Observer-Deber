@@ -169,7 +169,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         @Override
         public void actionPerformed(ActionEvent ae) {
             //Si desea apresurar el tiempo
-            cs += 2;
+            cs += 20;
             if (cs == 100) {
                 cs = 0;
                 ++segundos;
@@ -177,7 +177,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             if (segundos == 60) {
                 segundos = 0;
                 minutos++;
-                tiempoRestante -=1;
+                if(tiempoRestante >0){
+                    tiempoRestante -=1;
+                }
+                
 
                 if (sBateria.isEstadoEnCarga()) {
                     if (cantidadB < 100) {
@@ -234,7 +237,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         
 
         //Bateria
-        sBateria.setEstadoEnCarga(true);
+        this.obCarga.actualizar();
         cantidadB = Integer.valueOf(this.txtBateria.getText());
         sBateria.setPorcentajeBateria(cantidadB);
         
@@ -250,9 +253,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             reloj.stop();
             btCargar.setEnabled(true);
         }
-        btCargar.setText("Iniciar");
-        btDescargar.setEnabled(false);
+        
+        //btDescargar.setEnabled(false);
         btDesconectar.setEnabled(false);
+        this.txtBateria.setEnabled(true);
 
         minutos = 0;
         segundos = 0;
@@ -263,14 +267,16 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_btDesconectarActionPerformed
 
     private void btDescargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDescargarActionPerformed
+        reloj.start();
         btCargar.setEnabled(true);
         this.btDesconectar.setEnabled(true);
         this.lbTextoRestante.setVisible(false);
         this.lbTiempoRestante.setVisible(false);
+        this.txtBateria.setEnabled(false);
         
 
         //Bateria
-        sBateria.setEstadoEnCarga(false);
+        this.obDescarga.actualizar();
         cantidadB = Integer.valueOf(this.txtBateria.getText());
         sBateria.setPorcentajeBateria(cantidadB);
         
