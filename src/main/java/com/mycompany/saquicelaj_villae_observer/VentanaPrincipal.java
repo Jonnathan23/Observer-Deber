@@ -5,7 +5,9 @@
 package com.mycompany.saquicelaj_villae_observer;
 
 import Hilos.HilosCargar;
+import Hilos.HilosDescargar;
 import Observador.ObservadorCarga;
+import Observador.ObservadorDescarga;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -18,7 +20,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
     /* ----------- PRINCIPAL -------------*/
     static SujetoBateria bateria;// = new SujetoBateria();
-    static HilosCargar hiloCarga;// = new HilosCargar();
+    HilosCargar hiloCarga = new HilosCargar();
+    HilosDescargar hiloDescarga = new HilosDescargar();
+    
+
+    static ObservadorDescarga obDescarga;
     static int cantidad;
     static ObservadorCarga obCarga; //= new ObservadorCarga(bateria);
 
@@ -128,18 +134,29 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             System.out.println("Entro");
             bateria.setPorcentajeBateria(Integer.valueOf(this.txtBateria.getText()));
             System.out.println("Bateria: " + bateria.getPorcentajeBateria());
-            
+
             System.out.println("Sujeto: " + obCarga);
             obCarga.actualizar();
+
             hiloCarga.start();
-            
+            hiloDescarga.stop();
+
         }
 
 
     }//GEN-LAST:event_btCargarActionPerformed
 
     private void btDesconectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDesconectarActionPerformed
+        if (bateria.isEstadoEnCarga()) {
+            System.out.println("Entro");
+            System.out.println("Bateria: " + bateria.getPorcentajeBateria());
+            System.out.println("Sujeto: " + obCarga);
+            obDescarga.actualizar();
 
+            hiloDescarga.start();
+            hiloCarga.stop();
+
+        }
     }//GEN-LAST:event_btDesconectarActionPerformed
 
     /**
@@ -147,7 +164,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         bateria = new SujetoBateria();
-        hiloCarga = new HilosCargar();
+//        hiloCarga = new HilosCargar();
+//        hiloDescarga = new HilosDescargar();
         obCarga = new ObservadorCarga(bateria);
 
         //bateria.setPorcentajeBateria();
@@ -183,21 +201,34 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         });
     }
 
-    /* -- */
-    public SujetoBateria getBateria() {
+    public static SujetoBateria getBateria() {
         return bateria;
     }
 
-    public void setBateria(SujetoBateria bateria) {
-        this.bateria = bateria;
+    public static void setBateria(SujetoBateria bateria) {
+        VentanaPrincipal.bateria = bateria;
     }
 
-    public boolean getEstadoBateria() {
-        return bateria.isEstadoEnCarga();
+    public HilosCargar getHiloCarga() {
+        return hiloCarga;
     }
 
-    public int getPorcentajeBateria() {
-        return bateria.getPorcentajeBateria();
+  
+    public static int getCantidad() {
+        return cantidad;
+    }
+
+    public static void setCantidad(int cantidad) {
+        VentanaPrincipal.cantidad = cantidad;
+    }
+
+    public static ObservadorCarga getObCarga() {
+        return obCarga;
+    }
+
+    /* -- */
+    public static void setObCarga(ObservadorCarga obCarga) {
+        VentanaPrincipal.obCarga = obCarga;
     }
 
     public JButton getBtCargar() {

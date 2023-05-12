@@ -6,7 +6,6 @@ package Hilos;
 
 import com.mycompany.saquicelaj_villae_observer.SujetoBateria;
 import com.mycompany.saquicelaj_villae_observer.VentanaPrincipal;
-//import java.awt.Label;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -15,9 +14,7 @@ import javax.swing.JLabel;
  *
  * @author Jonna
  */
-
-public class HilosCargar extends Thread {
-    
+public class HilosDescargar extends Thread{
     
     VentanaPrincipal vt = new VentanaPrincipal();
     boolean ejecutar;
@@ -28,16 +25,17 @@ public class HilosCargar extends Thread {
     String frase = "";
     int minutos = 0;
     int segundos = 0;
-
+    
     @Override
     public void run() {
         System.out.println("Run");
+        
         ejecutar = sjBateria.isEstadoEnCarga();
         bateria = sjBateria.getPorcentajeBateria();
         System.out.println("Ejecutar en hilos: " + ejecutar);
        
         try {
-            while (ejecutar) {
+            while (ejecutar == false) {
 
                 Thread.sleep(250);
                 segundos += 1;
@@ -45,21 +43,22 @@ public class HilosCargar extends Thread {
                 if (segundos == 60) {
                     minutos += 1;
                     segundos = 0;
-                    if (bateria < 100) {
-                        if (bateria == 99) {
-                            bateria += 1;
+                    if (bateria > 0) {
+                        if (bateria == 1) {
+                            bateria -= 1;
                         } else {
-                            bateria += 2;
+                            bateria -= 2;
                         }
 
                         sjBateria.setPorcentajeBateria(bateria);
                     }
 
                 }
-                frase = "Bateria: "+ bateria + " " + minutos + " : " + segundos;
+                frase = "Bateria: "+ bateria + minutos + " : " + segundos;
                 System.out.println(frase);
                 reloj.setText(frase);
                 ejecutar = sjBateria.isEstadoEnCarga();
+
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(HilosCargar.class.getName()).log(Level.SEVERE, null, ex);
