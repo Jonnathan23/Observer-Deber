@@ -14,14 +14,14 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Jonna
+ * @author Jonna; Erika Gil
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
 
     /* ----------- PRINCIPAL -------------*/
     static SujetoBateria bateria;// = new SujetoBateria();
-    HilosCargar hiloCarga = new HilosCargar();
-    HilosDescargar hiloDescarga = new HilosDescargar();
+    static HilosCargar hiloCarga ;
+    static HilosDescargar hiloDescarga;
     
 
     static ObservadorDescarga obDescarga;
@@ -164,8 +164,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         bateria = new SujetoBateria();
-//        hiloCarga = new HilosCargar();
-//        hiloDescarga = new HilosDescargar();
+        hiloCarga = new HilosCargar();
+        hiloDescarga = new HilosDescargar();
         obCarga = new ObservadorCarga(bateria);
 
         //bateria.setPorcentajeBateria();
@@ -200,7 +200,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             }
         });
     }
-
+/**/
     public static SujetoBateria getBateria() {
         return bateria;
     }
@@ -209,21 +209,36 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         VentanaPrincipal.bateria = bateria;
     }
 
-    public HilosCargar getHiloCarga() {
+    public static HilosCargar getHiloCarga() {
         return hiloCarga;
     }
 
-  
+    public static void setHiloCarga(HilosCargar hiloCarga) {
+        VentanaPrincipal.hiloCarga = hiloCarga;
+    }
+
+    public static HilosDescargar getHiloDescarga() {
+        return hiloDescarga;
+    }
+
+    public static void setHiloDescarga(HilosDescargar hiloDescarga) {
+        VentanaPrincipal.hiloDescarga = hiloDescarga;
+    }
+
+    public static ObservadorDescarga getObDescarga() {
+        return obDescarga;
+    }
+
+    public static void setObDescarga(ObservadorDescarga obDescarga) {
+        VentanaPrincipal.obDescarga = obDescarga;
+    }
+
     public static int getCantidad() {
         return cantidad;
     }
 
     public static void setCantidad(int cantidad) {
         VentanaPrincipal.cantidad = cantidad;
-    }
-
-    public static ObservadorCarga getObCarga() {
-        return obCarga;
     }
 
     /* -- */
