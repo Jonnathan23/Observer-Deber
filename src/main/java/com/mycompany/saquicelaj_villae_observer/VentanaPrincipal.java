@@ -4,13 +4,16 @@
  */
 package com.mycompany.saquicelaj_villae_observer;
 
-import Hilos.HilosCargar;
-import Hilos.HilosDescargar;
+
 import Observador.ObservadorCarga;
 import Observador.ObservadorDescarga;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 
 /**
  *
@@ -19,20 +22,26 @@ import javax.swing.JTextField;
 public class VentanaPrincipal extends javax.swing.JFrame {
 
     /* ----------- PRINCIPAL -------------*/
-    static SujetoBateria bateria;// = new SujetoBateria();
-    static HilosCargar hiloCarga ;
-    static HilosDescargar hiloDescarga;
-    
+    private Timer reloj;
+    private int minutos, segundos, cs;
+    private ObservadorCarga obCarga;
+    private ObservadorDescarga obDescarga;
+    private SujetoBateria sBateria;
+    private int cantidadB;
+    private int tiempoRestante;
 
-    static ObservadorDescarga obDescarga;
-    static int cantidad;
-    static ObservadorCarga obCarga; //= new ObservadorCarga(bateria);
-
-    /**
-     * Creates new form VentanaPrincipal
-     */
     public VentanaPrincipal() {
         initComponents();
+        this.lbTextoRestante.setVisible(false);
+        this.lbTiempoRestante.setVisible(false);
+        
+        setLocationRelativeTo(null);
+
+        reloj = new Timer(10, acciones);
+        sBateria = new SujetoBateria();
+        obCarga = new ObservadorCarga(sBateria);
+        obDescarga = new ObservadorDescarga(sBateria);
+
     }
 
     /**
@@ -52,6 +61,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         lbReloj = new javax.swing.JLabel();
+        lbTextoRestante = new javax.swing.JLabel();
+        lbTiempoRestante = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -63,6 +74,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         });
 
         btDesconectar.setText("Desconectar");
+        btDesconectar.setEnabled(false);
         btDesconectar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btDesconectarActionPerformed(evt);
@@ -70,14 +82,29 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         });
 
         btDescargar.setText("Descargar");
+        btDescargar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btDescargarActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Bateria");
+
+        txtBateria.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtBateriaActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("%");
 
         jLabel3.setText("Tiempo");
 
         lbReloj.setText("00:00");
+
+        lbTextoRestante.setText("Tiempo restante");
+
+        lbTiempoRestante.setText("00:00");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -87,22 +114,28 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addGap(41, 41, 41)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
+                    .addComponent(jLabel3)
+                    .addComponent(lbTextoRestante))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(txtBateria, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btCargar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(lbReloj, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btDesconectar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btDescargar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(79, 79, 79))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(txtBateria, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btCargar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(lbReloj, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(btDesconectar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btDescargar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(79, 79, 79))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbTiempoRestante, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -119,80 +152,138 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel3)
                         .addComponent(lbReloj)))
-                .addGap(31, 31, 31)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbTextoRestante)
+                    .addComponent(lbTiempoRestante))
+                .addGap(4, 4, 4)
                 .addComponent(btDescargar)
-                .addContainerGap(243, Short.MAX_VALUE))
+                .addContainerGap(236, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCargarActionPerformed
-        System.out.println("Clic");
+    private ActionListener acciones = new ActionListener() {
 
-        if (bateria.isEstadoEnCarga() == false) {
-            System.out.println("Entro");
-            bateria.setPorcentajeBateria(Integer.valueOf(this.txtBateria.getText()));
-            System.out.println("Bateria: " + bateria.getPorcentajeBateria());
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            //Si desea apresurar el tiempo
+            cs += 2;
+            if (cs == 100) {
+                cs = 0;
+                ++segundos;
+            }
+            if (segundos == 60) {
+                segundos = 0;
+                minutos++;
+                tiempoRestante -=1;
 
-            System.out.println("Sujeto: " + obCarga);
-            obCarga.actualizar();
+                if (sBateria.isEstadoEnCarga()) {
+                    if (cantidadB < 100) {
+                        if (cantidadB == 99) {
+                            cantidadB += 1;
+                        } else {
+                            cantidadB += 2;
+                        }
+                        
+                    }
+                }else{
+                    if (cantidadB > 0) {
+                        if (cantidadB == 1) {
+                            cantidadB -= 1;
+                        } else {
+                            cantidadB -= 2;
+                        }
+                        
+                    }
+                }
+                sBateria.setPorcentajeBateria(cantidadB);
 
-            hiloCarga.start();
-            hiloDescarga.stop();
+            }
+            if (minutos == 60) {
+                minutos = 0;
 
+            }
+            actualizarVentana();
         }
+
+    };
+
+    public void actualizarVentana() {
+        String tiempo = " " + minutos + ": " + segundos;
+        String timeRest = tiempoRestante + " min.";
+        
+        txtBateria.setText(String.valueOf(cantidadB));
+        this.lbTiempoRestante.setText(timeRest);
+        lbReloj.setText(tiempo);
+
+    }
+
+
+    private void btCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCargarActionPerformed
+        reloj.start();
+        this.btDesconectar.setEnabled(true);
+        btCargar.setEnabled(false);
+        btDescargar.setEnabled(true);
+        
+        this.txtBateria.setEnabled(false);
+        
+        this.lbTextoRestante.setVisible(true);
+        this.lbTiempoRestante.setVisible(true);
+        
+
+        //Bateria
+        sBateria.setEstadoEnCarga(true);
+        cantidadB = Integer.valueOf(this.txtBateria.getText());
+        sBateria.setPorcentajeBateria(cantidadB);
+        
+        tiempoRestante = (100 - cantidadB)/2;
+        
+        
 
 
     }//GEN-LAST:event_btCargarActionPerformed
 
     private void btDesconectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDesconectarActionPerformed
-        if (bateria.isEstadoEnCarga()) {
-            System.out.println("Entro");
-            System.out.println("Bateria: " + bateria.getPorcentajeBateria());
-            System.out.println("Sujeto: " + obCarga);
-            obDescarga.actualizar();
-
-            hiloDescarga.start();
-            hiloCarga.stop();
-
+        if (reloj.isRunning()) {
+            reloj.stop();
+            btCargar.setEnabled(true);
         }
+        btCargar.setText("Iniciar");
+        btDescargar.setEnabled(false);
+        btDesconectar.setEnabled(false);
+
+        minutos = 0;
+        segundos = 0;
+
+        actualizarVentana();
+
+
     }//GEN-LAST:event_btDesconectarActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
+    private void btDescargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDescargarActionPerformed
+        btCargar.setEnabled(true);
+        this.btDesconectar.setEnabled(true);
+        this.lbTextoRestante.setVisible(false);
+        this.lbTiempoRestante.setVisible(false);
+        
+
+        //Bateria
+        sBateria.setEstadoEnCarga(false);
+        cantidadB = Integer.valueOf(this.txtBateria.getText());
+        sBateria.setPorcentajeBateria(cantidadB);
+        
+        
+        
+    }//GEN-LAST:event_btDescargarActionPerformed
+
+    private void txtBateriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBateriaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtBateriaActionPerformed
+
     public static void main(String args[]) {
-        bateria = new SujetoBateria();
-        hiloCarga = new HilosCargar();
-        hiloDescarga = new HilosDescargar();
-        obCarga = new ObservadorCarga(bateria);
 
-        //bateria.setPorcentajeBateria();
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new VentanaPrincipal().setVisible(true);
@@ -200,92 +291,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             }
         });
     }
-/**/
-    public static SujetoBateria getBateria() {
-        return bateria;
-    }
-
-    public static void setBateria(SujetoBateria bateria) {
-        VentanaPrincipal.bateria = bateria;
-    }
-
-    public static HilosCargar getHiloCarga() {
-        return hiloCarga;
-    }
-
-    public static void setHiloCarga(HilosCargar hiloCarga) {
-        VentanaPrincipal.hiloCarga = hiloCarga;
-    }
-
-    public static HilosDescargar getHiloDescarga() {
-        return hiloDescarga;
-    }
-
-    public static void setHiloDescarga(HilosDescargar hiloDescarga) {
-        VentanaPrincipal.hiloDescarga = hiloDescarga;
-    }
-
-    public static ObservadorDescarga getObDescarga() {
-        return obDescarga;
-    }
-
-    public static void setObDescarga(ObservadorDescarga obDescarga) {
-        VentanaPrincipal.obDescarga = obDescarga;
-    }
-
-    public static int getCantidad() {
-        return cantidad;
-    }
-
-    public static void setCantidad(int cantidad) {
-        VentanaPrincipal.cantidad = cantidad;
-    }
-
-    /* -- */
-    public static void setObCarga(ObservadorCarga obCarga) {
-        VentanaPrincipal.obCarga = obCarga;
-    }
-
-    public JButton getBtCargar() {
-        return btCargar;
-    }
-
-    public void setBtCargar(JButton btCargar) {
-        this.btCargar = btCargar;
-    }
-
-    public JButton getBtDescargar() {
-        return btDescargar;
-    }
-
-    public void setBtDescargar(JButton btDescargar) {
-        this.btDescargar = btDescargar;
-    }
-
-    public JButton getBtDesconectar() {
-        return btDesconectar;
-    }
-
-    public void setBtDesconectar(JButton btDesconectar) {
-        this.btDesconectar = btDesconectar;
-    }
-
-    public JLabel getLbReloj() {
-        return lbReloj;
-    }
-
-    public void setLbReloj(JLabel lbReloj) {
-        this.lbReloj = lbReloj;
-    }
-
-    public JTextField getTxtBateria() {
-        return txtBateria;
-    }
-
-    public void setTxtBateria(JTextField txtBateria) {
-        this.txtBateria = txtBateria;
-    }
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btCargar;
@@ -295,6 +300,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel lbReloj;
+    private javax.swing.JLabel lbTextoRestante;
+    private javax.swing.JLabel lbTiempoRestante;
     private javax.swing.JTextField txtBateria;
     // End of variables declaration//GEN-END:variables
 }

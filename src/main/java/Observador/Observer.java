@@ -4,7 +4,7 @@
  */
 package Observador;
 
-import Hilos.HilosCargar;
+
 import com.mycompany.saquicelaj_villae_observer.SujetoBateria;
 
 
