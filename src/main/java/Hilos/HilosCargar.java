@@ -15,8 +15,10 @@ import javax.swing.JLabel;
  *
  * @author Jonna
  */
-public class HilosCargar extends Thread {
 
+public class HilosCargar extends Thread {
+    
+    
     VentanaPrincipal vt = new VentanaPrincipal();
     boolean ejecutar = vt.getEstadoBateria();
     SujetoBateria sjBateria = vt.getBateria();
@@ -29,6 +31,10 @@ public class HilosCargar extends Thread {
 
     @Override
     public void run() {
+        System.out.println("Run");
+        System.out.println("Ejecutar en hilos: " + ejecutar);
+        
+        
         try {
             while (ejecutar) {
 
@@ -50,6 +56,7 @@ public class HilosCargar extends Thread {
 
                 }
                 frase = " " + minutos + " : " + segundos;
+                System.out.println(frase);
                 reloj.setText(frase);
 
             }

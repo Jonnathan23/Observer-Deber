@@ -16,12 +16,12 @@ import javax.swing.JTextField;
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
 
-    /* ----------- PRINCIPAL -------------
-    SujetoBateria bateria = new SujetoBateria();
-    HilosCargar hiloCarga = new HilosCargar();
+    /* ----------- PRINCIPAL -------------*/
+    static SujetoBateria bateria;// = new SujetoBateria();
+    static HilosCargar hiloCarga;// = new HilosCargar();
+    static int cantidad;
+    static ObservadorCarga obCarga; //= new ObservadorCarga(bateria);
 
-    ObservadorCarga obCarga = new ObservadorCarga(bateria);
-*/
     /**
      * Creates new form VentanaPrincipal
      */
@@ -79,26 +79,23 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(41, 41, 41)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btDescargar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(txtBateria, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btCargar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(lbReloj, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lbReloj, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btDesconectar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtBateria, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 98, Short.MAX_VALUE)
-                                .addComponent(btCargar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addComponent(btDesconectar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btDescargar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(79, 79, 79))
         );
         layout.setVerticalGroup(
@@ -125,18 +122,35 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCargarActionPerformed
-//        hiloCarga.start();
-//        obCarga.actualizar();
+        System.out.println("Clic");
+
+        if (bateria.isEstadoEnCarga() == false) {
+            System.out.println("Entro");
+            bateria.setPorcentajeBateria(Integer.valueOf(this.txtBateria.getText()));
+            System.out.println("Bateria: " + bateria.getPorcentajeBateria());
+            
+            System.out.println("Sujeto: " + obCarga);
+            obCarga.actualizar();
+            hiloCarga.start();
+            
+        }
+
+
     }//GEN-LAST:event_btCargarActionPerformed
 
     private void btDesconectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDesconectarActionPerformed
-        
+
     }//GEN-LAST:event_btDesconectarActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        bateria = new SujetoBateria();
+        hiloCarga = new HilosCargar();
+        obCarga = new ObservadorCarga(bateria);
+
+        //bateria.setPorcentajeBateria();
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -168,7 +182,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             }
         });
     }
-/*
+
+    /* -- */
     public SujetoBateria getBateria() {
         return bateria;
     }
@@ -180,11 +195,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     public boolean getEstadoBateria() {
         return bateria.isEstadoEnCarga();
     }
-    
-    public int getPorcentajeBateria(){
+
+    public int getPorcentajeBateria() {
         return bateria.getPorcentajeBateria();
     }
-*/
+
     public JButton getBtCargar() {
         return btCargar;
     }

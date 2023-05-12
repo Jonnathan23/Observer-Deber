@@ -24,4 +24,8 @@ public class ObservadorCarga extends Observer {
         this.sujeto.setEstadoEnCarga(true);
     }
 
+   
+    
+    
+
 }
